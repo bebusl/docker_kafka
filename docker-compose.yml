@@ -1,0 +1,60 @@
+version: "3.9"
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:5.5.1
+    links:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    env_file:
+      - ./.env
+
+  producer:
+    build:
+      context: ./producer
+    depends_on:
+      - kafka
+  consumer_1:
+    build:
+      context: ./consumer
+    depends_on:
+      - kafka
+
+  consumer_2:
+    build:
+      context: ./consumer
+    depends_on:
+      - kafka
+  consumer_3:
+    build:
+      context: ./consumer
+    depends_on:
+      - kafka
+#   zookeeper:
+#     image: zookeeper:3.4.9
+#     ports:
+#       - "2181:2181"
+
+#   kafka:
+#     image: confluentinc/cp-kafka:5.5.1
+#     environment:
+#       KAFKA_ADVERTISED_HOST_NAME: kafka
+#       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9093,LISTENER_DOCKER_EXTERNAL://127.0.0.1:9092
+#       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+#       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+#       KAFKA_CREATE_TOPICS: "test-topic:3:1"
+#       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+#     links:
+#       - zookeeper
+#     ports:
+#       - "9092:9092"
+#     depends_on:
+#       - zookeeper
+
